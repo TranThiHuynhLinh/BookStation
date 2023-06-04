@@ -1,0 +1,20 @@
+﻿.wrap-container {
+    margin-top: 80px;
+}
+
+.thead-username {
+    width: 65%;
+}
+
+.thead-num {
+    width: 26%;
+}
+
+h2 {
+    text-align: center;
+}
+
+.submit-btn {
+    margin-top: 20px;
+    margin-right: 20px;
+}

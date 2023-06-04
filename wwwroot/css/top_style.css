@@ -1,0 +1,35 @@
+﻿body {
+    background-image: url("/img/top10_bg.jpeg");
+    background-clip: unset;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+.wrap-container{
+    margin-top: 100px;
+}
+
+.link {
+    text-decoration: none;
+    color: white;
+}
+
+.link:hover{
+    font-weight: bold;
+    color: #fff;
+}
+
+.star {
+    grid-gap: .2rem;
+    font-size: 1rem;
+    color: yellow;
+    margin-left: 4px;
+}
+
+.top-title{
+    color: #acac53;
+}
+
+.top-table{
+    background-color: #a3a35f52;
+    border-radius: 20px;
+}

@@ -1,0 +1,45 @@
+﻿.wrap-container{
+    margin-top: 80px;
+}
+.star {
+    grid-gap: .5rem;
+    font-size: 1.4rem;
+    color: yellow;
+}
+
+.reviewer-wrap {
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 12px;
+}
+
+.reviewer-title {
+    background-color: #262A56;
+    line-height: 80px;
+    height: 80px;
+}
+
+.reviewer-up {
+    background-color: #1F8A70;
+    line-height: 60px;
+    height: 60px;
+    width: 50%;
+    margin-left: 25%;
+}
+
+.reviewer-down {
+    background-color: #F48484;
+    line-height: 60px;
+    height: 60px;
+    width: 50%;
+    margin-left: 25%;
+}
+
+.reviewer-total {
+    background-color: #262A56;
+    line-height: 60px;
+    height: 60px;
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 40px;
+}

@@ -1,0 +1,14 @@
+khi sử dụng _context.Entries.OrderBy thì toàn bộ entries trong table sẽ được load lên trước khi phân trang. Điều này có thể ảnh hưởng đến performance khi có một số lượng lớn entries trong table.
+
+Để giải quyết vấn đề này, bạn có thể sử dụng phương pháp phân trang trực tiếp trong câu truy vấn SQL bằng cách sử dụng cú pháp OFFSET và FETCH NEXT. Ví dụ:
+
+public IActionResult Index(int page = 1, int pageSize = 10)
+{
+    var books = _context.Books
+        .OrderByDescending(b => b.CreatedAt)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+
+    return View(books);
+}

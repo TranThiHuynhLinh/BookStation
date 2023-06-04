@@ -1,0 +1,149 @@
+﻿body {
+    overflow-x: hidden;
+}
+
+.holder {
+    margin-top: 72px;
+}
+
+.wrap-book {
+    position: relative;
+}
+
+.shelf {
+    border-bottom: 30px solid #B19886;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    top: -15px;
+    z-index: -10;
+    margin-top: 20px;
+    margin-bottom: 1.5em;
+}
+
+    .shelf:after {
+        content: '';
+        background: #855E42;
+        height: 20px;
+        width: calc(100% + 40px); /*IE9+*/
+        position: absolute;
+        top: 30px;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        margin: 0 -20px;
+    }
+
+.book-img {
+    width: 90%;
+    height: 252px;
+    border-radius: 8px;
+    transition: all ease-in 0.3s;
+}
+
+    .book-img:hover {
+        scale: 1.1;
+    }
+
+.img-blur {
+    filter: blur(2px);
+}
+
+.active-btn {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.remove-btn {
+    top: 0px;
+    right: 0px;
+    position: absolute;
+    visibility: hidden;
+    transition: all ease-in 0.3s;
+}
+
+    .remove-btn:hover {
+        scale: 1.2;
+    }
+
+.shelf-title {
+    margin-bottom: 18px;
+}
+
+.wrap-profile {
+    height: 600px;
+    width: 320px;
+    margin-left: 20px;
+    padding: 4px 4px;
+    position: fixed;
+    border-radius: 12px;
+    border: 2px solid blue;
+    transition: all 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .wrap-profile:hover {
+        scale: 1.05;
+    }
+
+.user-img {
+    width: 36%;
+    border-radius: 50%;
+    transition: all 0.5s ease-in-out;
+    max-height: 150px;
+}
+
+.user-img:hover{
+    scale: 1.1;
+    border-radius: 40%;
+    cursor: pointer;
+}
+
+.user-gmail {
+    font-size: 18px;
+}
+
+.user-book-count {
+    border: 1px solid purple;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.5s ease-in-out;
+}
+
+    .user-book-count h5 {
+        font-size: 14px;
+        line-height: 14px;
+    }
+
+.user-book-count:hover{
+    scale: 1.1;
+    color: #fff;
+}
+
+.user-highest-review {
+    height: 320px;
+    text-align: center;
+}
+
+.user-highest-review-content {
+    font-size: 16px;
+    padding: 0px 8px;
+}
+.btn-submit-ava {
+    border: 3px solid #198754;
+    font-weight: 900;
+    color: #198754;
+    width: 100px;
+    margin-right: 20px;
+}
+
+.btn-submit-ava:hover {
+    background-color: #198754;
+    color: #fff;
+}
+
+.img-avt{
+    width: 500px;
+}

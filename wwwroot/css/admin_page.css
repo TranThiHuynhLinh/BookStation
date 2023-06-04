@@ -1,0 +1,54 @@
+﻿.swap-btn-container{
+    margin-bottom: 8px;
+}
+.table {
+    color: white;
+    border: 1px solid;
+}
+.admin_container{
+    margin-top: 80px;
+}
+
+.admin_button {
+    color: white; 
+    text-decoration: none;
+}
+
+.admin_button:hover{
+    color: white;
+}
+textarea.form-control {
+    resize: none;
+    height: 320px;
+}
+.form-control {
+    padding: 4px;
+    border: 3px solid #bb9dc1;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.search-bar {
+    width: 160px;
+    border: #fff solid 2px;
+    padding: 8px 12px;
+    font-size: 18px;
+    border-radius: 25px;
+    background-position: 2% 50%;
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-color: #fffff813;
+    transition: 0.5s all ease-in-out;
+    color: #fff !important;
+}
+
+    .search-bar:hover,
+    .search-bar:focus,
+    .search-bar:not(:placeholder-shown) {
+        width: 100%;
+        background-color: transparent;
+        filter: brightness(100%);
+    }
+
