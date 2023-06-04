@@ -1,0 +1,42 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/login_style.css">
+    <title>Sign up Form</title>
+</head>
+<body>
+    <section>
+        <div class="container form-box right-panel-active" id="container">
+            <div class="form-container sign-up-container">
+                <form method="post">
+                    <h1>Create Account</h1>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    <input type="email" asp-for="Input.Email" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <input type="password" asp-for="Input.Password" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <input type="password" asp-for="Input.ConfirmPassword" autocomplete="current-password" aria-required="true" placeholder="confirm password" />
+                    <a href="#">Forgot your password?</a>
+                    <button>Create</button>
+                </form>
+            </div>
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-right">
+                        <h1>Hello, Friend!</h1>
+                        <p>Enter your personal details and start journey with us</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
