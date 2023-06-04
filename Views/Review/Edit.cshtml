@@ -1,0 +1,92 @@
+﻿@model BookStation.Models.Review
+@{
+    ViewData["Title"] = "Edit";
+}
+<html>
+<head>
+    <title>Edit your review</title>
+    <link rel="stylesheet" href="~/css/review_style.css" />
+</head>
+<body>
+    <div class="edit-model">
+        <div class="write-container">
+            <div class="write-btn-container">
+                <button class="btn post-btn upd-btn">Post</button>
+                <a class="btn close-btn">Cancel</a>
+            </div>
+            <div class="write-zone">
+                <div class="rating-zone">
+                    <form asp-action="Edit" id="update-review">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="ReviewId" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden" asp-for="ReviewDate" id="current-date" />
+                        <div class="rating-zone-header form-group rating">
+                            <p>Your rating: </p>
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                if (i < Model.Rating)
+                                {
+                                    <label class='bx bxs-star star active' style="--i: @i;"></label>
+                                }
+                                else
+                                {
+                                    <label class='bx bx-star star' style="--i: @i;"></label>
+                                }
+                            }
+                            <input hidden asp-for="Rating" class="form-control" type="text" required />
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+                        <input type="hidden" asp-for="UpVotes" />
+                        <input type="hidden" asp-for="DownVotes" />
+                        <input type="hidden" asp-for="TotalVotes" />
+                        <textarea asp-for="Detail" class="review-text"></textarea>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        date = new Date();
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        day = date.getDate();
+        var currentDateElements = document.querySelectorAll('#current-date');
+        for (var i = 0; i < currentDateElements.length; i++) {
+            currentDateElements[i].value = day + "-" + month + "-" + year;
+        }
+
+        const allStar = document.querySelectorAll('.edit-model .rating .star')
+        const ratingValue = document.querySelector('.edit-model .rating input')
+
+        allStar.forEach((item, idx) => {
+            item.addEventListener('click', function () {
+                let click = 0
+                ratingValue.value = idx + 1
+
+                allStar.forEach(i => {
+                    i.classList.replace('bxs-star', 'bx-star')
+                    i.classList.remove('active')
+                })
+                for (let i = 0; i < allStar.length; i++) {
+                    if (i <= idx) {
+                        allStar[i].classList.replace('bx-star', 'bxs-star')
+                        allStar[i].classList.add('active')
+                    } else {
+                        allStar[i].style.setProperty('--i', click)
+                        click++
+                    }
+                }
+            })
+        })
+        document.querySelector('.upd-btn').addEventListener('click', function () {
+            document.querySelector('#update-review').submit();
+        });
+        document.querySelector('.close-btn').addEventListener('click', function () {
+            history.back();
+        });
+    </script>
+</body>
+</html>

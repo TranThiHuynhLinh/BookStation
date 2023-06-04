@@ -1,0 +1,40 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    string GetUserNameFromGmail(string gmail)
+    {
+        int index = gmail.IndexOf('@');
+        return gmail.Substring(0, index);
+    }
+}
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <form id="manage" class="form-inline fw-bold text-white fs-6" style="line-height: initial;"
+                asp-area="Identity" asp-page="/Account/Manage/Index" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <a class="nav-link active fw-bold text-white fs-6" aria-current="page">
+                    @GetUserNameFromGmail(UserManager.GetUserName(User))
+                </a>
+            </form>
+        </li>
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline fw-bold text-white fs-6" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button id="logout" type="submit" class="btn btn-outline-danger fw-bold">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link fw-bold text-white fs-6" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-bold text-white fs-6" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
+</ul>

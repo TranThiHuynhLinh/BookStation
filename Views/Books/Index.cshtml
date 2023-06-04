@@ -1,0 +1,127 @@
+﻿
+@model IEnumerable<BookStation.Models.Book>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<head>
+    <title>Admin Zone - Authors</title>
+    <link rel="stylesheet" href="~/css/admin_page.css" />
+</head>
+<body>
+    <div class="admin_container container">
+        <div class="swap-btn-container">
+            <a class="btn btn-outline-primary" asp-controller="Authors" asp-action="Index">Authors</a>
+            <a class="btn btn-outline-success" asp-controller="Categories" asp-action="Index">Categories</a>
+            <a class="btn btn-outline-primary" asp-controller="Books" asp-action="Index">Books</a>
+            <a class="btn btn-outline-success" asp-controller="Reviews" asp-action="Index">Reviews</a>
+        </div>
+        <button class="btn btn-primary mb-2">
+            <a class="admin_button" asp-action="Create">Create New</a>
+        </button>
+        <input type="text" id="Search" placeholder="Search" class="form-control search-bar" />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BookName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AuthorId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CategoryId1)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CategoryId2)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CategoryId3)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Summary)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="Search">
+                        <td class="book-name">
+                            @Html.DisplayFor(modelItem => item.BookName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuthorId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryId1)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryId2)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryId3)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Summary)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.BookId">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.BookId">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.BookId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        function removeVietnameseDiacritics(text) {
+            const diacriticsMap = {
+                'á': 'a', 'à': 'a', 'ả': 'a', 'ã': 'a', 'ạ': 'a',
+                'â': 'a', 'ấ': 'a', 'ầ': 'a', 'ẩ': 'a', 'ẫ': 'a', 'ậ': 'a',
+                'ă': 'a', 'ắ': 'a', 'ằ': 'a', 'ẳ': 'a', 'ẵ': 'a', 'ặ': 'a',
+                'đ': 'd',
+                'é': 'e', 'è': 'e', 'ẻ': 'e', 'ẽ': 'e', 'ẹ': 'e',
+                'ê': 'e', 'ế': 'e', 'ề': 'e', 'ể': 'e', 'ễ': 'e', 'ệ': 'e',
+                'í': 'i', 'ì': 'i', 'ỉ': 'i', 'ĩ': 'i', 'ị': 'i',
+                'ó': 'o', 'ò': 'o', 'ỏ': 'o', 'õ': 'o', 'ọ': 'o',
+                'ô': 'o', 'ố': 'o', 'ồ': 'o', 'ổ': 'o', 'ỗ': 'o', 'ộ': 'o',
+                'ơ': 'o', 'ớ': 'o', 'ờ': 'o', 'ở': 'o', 'ỡ': 'o', 'ợ': 'o',
+                'ú': 'u', 'ù': 'u', 'ủ': 'u', 'ũ': 'u', 'ụ': 'u',
+                'ư': 'u', 'ứ': 'u', 'ừ': 'u', 'ử': 'u', 'ữ': 'u', 'ự': 'u',
+                'ý': 'y', 'ỳ': 'y', 'ỷ': 'y', 'ỹ': 'y', 'ỵ': 'y',
+            };
+
+            return text.replace(/[^\u0000-\u007E]/g, function (char) {
+                return diacriticsMap[char] || char;
+            });
+        }
+        function Contains(text1, text2) {
+            const normalizedText1 = removeVietnameseDiacritics(text1.toLowerCase());
+            const normalizedText2 = removeVietnameseDiacritics(text2.toLowerCase());
+            if (normalizedText1.includes(normalizedText2)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        $("#Search").keyup(function () {
+            var searchText = $("#Search").val().toLowerCase();
+            $(".Search").each(function () {
+                var bookName = $(this).find(".book-name").text().toLowerCase();
+                if (!Contains(bookName, searchText)) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+    });
+
+</script>

@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model PersonalViewModel
+@inject UserManager<IdentityUser> UserManager
+@inject UserAvatar userAvatar
+
+@{
+    ViewData["Title"] = "Personal";
+    IdentityUser user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+    int count = 0;
+}
+
+<html>
+<head>
+    <title>Personal</title>
+    <link rel="stylesheet" href="~/css/personal_style.css" />
+</head>
+<body>
+    <div class="container-fluid holder">
+        <div class="row">
+            <div class="col col-3">
+                <div class="wrap-profile">
+                    <img src="~/img/avt_img/@userAvatar.getAvatarOfUser(user.Id)" class="user-img" />
+                    <h3 class="user-gmail">@UserManager.GetUserName(User)</h3>
+                    <div class="user-book-count">
+                        <h5>Books Reviewed: @Model.CountReviews(UserManager.GetUserId(User))</h5>
+                        <h5>Your total Up votes: @Model.GetUpVotes(UserManager.GetUserId(User))</h5>
+                        <h5>Your total Down votes: @Model.GetDownVotes(UserManager.GetUserId(User))</h5>
+                        @{
+                            int total = Model.GetUpVotes(UserManager.GetUserId(User)) - Model.GetDownVotes(UserManager.GetUserId(User));
+                        }
+                        <h5>Your total votes: @total</h5>
+                    </div>
+                    <div class="user-highest-review">
+                        <h5>From your highest votes review</h5>
+                        <p class="user-highest-review-content">@Model.SelectText(Model.GetHighestReview(UserManager.GetUserId(User)), 500)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-9">
+                <div class="container">
+                    <div class="row">
+                        <h2 class="shelf-title">
+                            My Book Shelfs
+                        </h2>
+                        @foreach (var obj in Model.FavouriteBooks)
+                        {
+                            if (obj.UserId == UserManager.GetUserId(User))
+                            {
+                                <div class="col col-3 wrap-book">
+                                    <a href="/Review/Index?bookId=@obj.BookId"> <img class="book-img" src="./img/book_img/@(obj.BookId).jpg" alt="Image Title" /> </a>
+                                    <a class="btn btn-danger remove-btn" href="Personal/Delete/@obj.FavouriteBookId">Remove</a>
+                                </div>
+                                if (++count == 4)
+                                {
+                                    <div class="col col-12 shelf"></div>
+                                    count = 0;
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="~/js/personal.js"></script>
+</body>
+</html>
+

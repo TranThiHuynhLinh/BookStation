@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc;
+
+@if (User.IsInRole("admin"))
+{
+    <div class="dropdown">
+        <button class="btn btn-outline-danger fw-bold dropdown-toggle" style="margin-right: 12px" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Manager Menu
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index">Authors</a></li>
+            <li><a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a></li>
+            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categories</a></li>
+            <li><a class="dropdown-item" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
+            <li><a class="dropdown-item" asp-controller="Blocks" asp-action="Index">Blocks</a></li>
+        </ul>
+    </div>
+}

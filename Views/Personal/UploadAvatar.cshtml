@@ -1,0 +1,39 @@
+﻿@model SubUserInfo
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> UserManager;
+@inject UserAvatar userAvatar;
+@using BookStation.Controllers;
+@{
+    ViewData["Title"] = "Avartar";
+    IdentityUser user = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+    var subUserInfo = userAvatar.getSubUserInfos(user.Id);
+}
+<head>
+    <title>Edit Avatar</title>
+    <link rel="stylesheet" href="~/css/personal_style.css" />
+</head>
+<body>
+    <div class="container holder">
+        <form asp-controller="SubUserInfoes" asp-action="uploadAvatar" enctype="multipart/form-data" method="post">
+            <div class="row">
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-submit-ava" />
+                </div>
+                <div class="mb-3">
+                    <input asp-for="infoID" class="form-control" type="hidden" value="@subUserInfo.infoID" />
+                    <input asp-for="FileUpload" class="form-control" type="file" id="FileUpload" onchange="preview()">
+                    <img id="frame" src="~/img/avt_img/@subUserInfo.AvatarName" class="img-avt" />
+                    <input asp-for="UserID" class="form-control" type="hidden" value="@subUserInfo.UserID" />
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    function preview() {
+        frame.src = URL.createObjectURL(event.target.files[0]);
+    }
+    document.querySelector(".btn-submit-ava").addEventListener("click", function(){
+        windows.location.reload(true);
+    })
+</script>

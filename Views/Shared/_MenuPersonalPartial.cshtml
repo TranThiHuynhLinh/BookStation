@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc;
+
+@if (User.IsInRole("user") || User.IsInRole("admin"))
+{
+    <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle fw-bold" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Personal Menu
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" asp-controller="Personal" asp-action="Index">Personal</a></li>
+            <li><a class="dropdown-item" href="/Identity/Account/Manage/ChangePassword">Change Password</a></li>
+        </ul>
+    </div>
+}

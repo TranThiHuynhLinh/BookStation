@@ -1,0 +1,246 @@
+﻿@model FullDataViewModel
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> UserManager;
+<head>
+    <title>Top 10</title>
+    <link rel="stylesheet" href="~/css/top_style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<body>
+    <div class="container wrap-container">
+        <div class="row">
+            <div class="col col-6">
+                <h2 class="top-title">Top 10 Most Popular Books</h2>
+                <table class="table top-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Rank
+                            </th>
+                            <th style="width: 70%">
+                                Book Name
+                            </th>
+                            <th style="width: 20%;">
+                                Total reviews
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rank = 1;
+                            foreach (var id in Model.ListPopularBookId(10))
+                            {
+                                Book book = Model.FindBook(id, Model.Books);
+                                <tr>
+                                    <td>
+                                        @if (rank == 1)
+                                        {
+                                            <i class="fas fa-medal" style="color: yellow;"></i>
+                                        }
+                                        else if (rank == 2)
+                                        {
+                                            <i class="fas fa-medal" style="color: white;"></i>
+                                        }
+                                        else if (rank == 3)
+                                        {
+                                            <i class="fas fa-medal" style="color: brown;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-medal" style="color: transparent;"></i>
+                                        }
+                                        @rank
+                                    </td>
+                                    <td>
+                                        <a class="link" href="/Review/Index?bookId=@book.BookId">
+                                            @book.BookName
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Model.countTotalReviews(book.BookId)
+                                    </td>
+                                </tr>
+                                rank++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col col-6">
+                <h2 class="top-title">Top 10 Highest Rated Books</h2>
+                <table class="table top-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Rank
+                            </th>
+                            <th style="width: 80%;">
+                                Book Name
+                            </th>
+                            <th style="width: 10%;">
+                                Rating
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            rank = 1;
+                            foreach (var book in Model.ListHighestRatedBook(10, Model.Books))
+                            {
+                                <tr>
+                                    <td>
+                                        @if (rank == 1)
+                                        {
+                                            <i class="fas fa-medal" style="color: yellow;"></i>
+                                        }
+                                        else if (rank == 2)
+                                        {
+                                            <i class="fas fa-medal" style="color: white;"></i>
+                                        }
+                                        else if (rank == 3)
+                                        {
+                                            <i class="fas fa-medal" style="color: brown;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-medal" style="color: transparent;"></i>
+                                        }
+                                        @rank
+                                    </td>
+                                    <td>
+                                        <a class="link" href="/Review/Index?bookId=@book.BookId">
+                                            @book.BookName
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Model.GetAverageRating(book.BookId)
+                                        <label class='bx bxs-star star'></label>
+                                    </td>
+                                </tr>
+                                rank++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col col-6">
+                <h2 class="top-title">Top 10 Highest Voted Reviewers</h2>
+                <table class="table top-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Rank
+                            </th>
+                            <th style="width: 70%">
+                                Reviewer
+                            </th>
+                            <th style="width: 20%;">
+                                Vote
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            rank = 1;
+                            foreach (var id in Model.ListHighestVoteReviewer(10, UserManager))
+                            {
+                                IdentityUser user = await UserManager.FindByIdAsync(id);
+                                string userName = user.UserName;
+                                <tr>
+                                    <td>
+                                        @if (rank == 1)
+                                        {
+                                            <i class="fas fa-medal" style="color: yellow;"></i>
+                                        }
+                                        else if (rank == 2)
+                                        {
+                                            <i class="fas fa-medal" style="color: white;"></i>
+                                        }
+                                        else if (rank == 3)
+                                        {
+                                            <i class="fas fa-medal" style="color: brown;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-medal" style="color: transparent;"></i>
+                                        }
+                                        @rank
+                                    </td>
+                                    <td>
+                                        <a class="link" href="/Reviewer/Index?userId=@id">
+                                            @user.UserName
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Model.GetTotalVotes(id)
+                                    </td>
+                                </tr>
+                                rank++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col col-6">
+                <h2 class="top-title">Top 10 Enthusiastic Reviewers</h2>
+                <table class="table top-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Rank
+                            </th>
+                            <th style="width: 60%">
+                                Reviewer
+                            </th>
+                            <th>
+                                Number Of Reviews
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            rank = 1;
+                            foreach (var id in Model.ListEnthusiasticReviewer(10, UserManager))
+                            {
+                                IdentityUser user = await UserManager.FindByIdAsync(id);
+                                string userName = user.UserName;
+                                <tr>
+                                    <td>
+                                        @if (rank == 1)
+                                        {
+                                            <i class="fas fa-medal" style="color: yellow;"></i>
+                                        }
+                                        else if (rank == 2)
+                                        {
+                                            <i class="fas fa-medal" style="color: white;"></i>
+                                        }
+                                        else if (rank == 3)
+                                        {
+                                            <i class="fas fa-medal" style="color: brown;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-medal" style="color: transparent;"></i>
+                                        }
+                                        @rank
+                                    </td>
+                                    <td>
+                                        <a class="link" href="/Reviewer/Index?userId=@id">
+                                            @user.UserName
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @Model.CountReviews(id)
+                                    </td>
+                                </tr>
+                                rank++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>

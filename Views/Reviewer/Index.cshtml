@@ -1,0 +1,68 @@
+﻿@model FullDataViewModel
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> UserManager;
+@{
+    ViewData["Title"] = "Reviewer";
+    var userId = ViewContext.HttpContext.Request.Query["userId"];
+    IdentityUser user = await UserManager.FindByIdAsync(userId);
+}
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/reviewer_style.css" />
+    <link rel="stylesheet" href="~/css/book_card.css" />
+    <title>Reviewer: @user.UserName</title>
+</head>
+<body>
+    <div class="container wrap-container">
+        <h2 class="reviewer-wrap reviewer-title">
+            All reviews of Reviewer: @user.UserName
+        </h2>
+        <h2 class="reviewer-wrap reviewer-up">
+            Total Up votes: @Model.GetUpVotes(userId)
+        </h2>
+        <h2 class="reviewer-wrap reviewer-down">
+            Total Down votes: @Model.GetDownVotes(userId)
+        </h2>
+        <h2 class="reviewer-wrap reviewer-total">
+            Total votes: @Model.GetTotalVotes(userId)
+        </h2>
+        @{
+            string[] classes = new string[] { "blue", "red", "green", "yellow" };
+            Random count = new Random();
+            List<Review> listRev = new List<Review>();
+            listRev = Model.ListUserReviews(userId);
+            foreach(var rev in listRev)
+            {
+                <article class="postcard @classes[count.Next(0,3)]">
+                    <a class="postcard__img_link" href="#">
+                        <img class="postcard__img" src="~/img/book_img/@(@Model.FindBook(rev.BookId, Model.Books).ImageName)" alt="Image Title" />
+                    </a>
+                    <div class="postcard__text">
+                        <h1 class="postcard__title @classes[count.Next(0,3)]"><a href="/Review/Index?bookId=@rev.BookId">@Model.FindBook(rev.BookId, Model.Books).BookName</a></h1>
+                        <div class="postcard__bar"></div>
+                        <div class="postcard__preview-txt">@rev.Detail</div>
+                        <ul class="postcard__tagbox" style="list-style-type: none;">
+                            <li style="margin-right: 12px;">
+                                @for (int i = 0; i < 5; i++)
+                                {
+                                    if (i < rev.Rating)
+                                    {
+                                        <label class='bx bxs-star star active' style="--i: @i;"></label>
+                                    }
+                                    else
+                                    {
+                                        <label class='bx bx-star star' style="--i: @i;"></label>
+                                    }
+                                }
+                            </li>
+                            <li class="tag__item">
+                                Total Votes: @rev.TotalVotes
+                            </li>  
+                        </ul>
+                    </div>
+                </article>
+            }
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,574 @@
+﻿@model FullDataViewModel;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<IdentityUser> UserManager;
+@inject SignInManager<IdentityUser> SignInManager;
+
+@{
+    var redirect = "true";
+    if (User.Identity.IsAuthenticated)
+    {
+        redirect = "false";
+    }
+};
+
+
+@{
+    ViewData["Title"] = "Review Page";
+    var bookId = Int32.Parse(ViewContext.HttpContext.Request.Query["bookId"]);
+    Book thisBook = Model.FindBook(bookId, Model.Books);
+    string title = thisBook.BookName;
+    string userId = (SignInManager.IsSignedIn(User)) ? UserManager.GetUserId(User) : "null";
+    int exitedReviewId = 0;
+};
+
+
+@{
+    String pageVar = ViewContext.HttpContext.Request.Query["page"];
+    int itemsPerPage = 5;
+    int totalItems = Model.countTotalReviews(bookId); 
+    int currentPage = Int32.Parse(pageVar == null ? "0" : pageVar);
+    int pageCount = (totalItems - 1) / itemsPerPage + 1;
+    int firstPage = 0;
+    int lastPage = pageCount - 1;
+    currentPage = (currentPage > pageCount ? (pageCount -1) : currentPage);
+
+    List<int> pageNumbers;
+
+    if (pageCount <= 3)
+    {
+
+        pageNumbers = new List<int>();
+        for (int i = 0; i < pageCount; i++)
+        {
+            pageNumbers.Add(i);
+        }
+
+    } else
+    {
+        if ((currentPage + 1) == pageCount)
+        {
+            int[] range = { currentPage - 2, currentPage - 1, currentPage };
+            pageNumbers = new List<int>(range);
+        } else
+        {
+            int[] range = { currentPage - 1, currentPage, currentPage + 1 };
+            pageNumbers = new List<int>(range);
+        }
+    }
+};
+
+<!doctype html>
+<html>
+<head>
+    <title>@title</title>
+    <link rel="stylesheet" href="~/css/book_card.css" />
+    <link rel="stylesheet" href="~/css/review_style.css" />
+</head>
+<body onload="initClock()">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col col-9">
+                <article class="postcard dark red book-detail">
+                    <div class="book-card-text">
+                        <h1 class="postcard__title blue">@thisBook.BookName</h1>
+                        <div class="postcard__subtitle small">
+                            <a class="mr-2">@Model.FindAuthor(thisBook.AuthorId, Model.Authors)</a>
+                        </div>
+                        <div class="postcard__bar"></div>
+                        <div class="postcard__preview-txt">@thisBook.Summary</div>
+                        <ul class="postcard__tagbox">
+                            <li class="tag__item">
+                                <i class="mr-2"></i>
+                                <a href="/Review/Index?bookId=@thisBook.BookId&category_id=@thisBook.CategoryId1">@Model.FindCategory(thisBook.CategoryId1, Model.Categories)</a>
+                            </li>
+                            <li class="tag__item">
+                                <i class="mr-2"></i>
+                                <a href="/Review/Index?bookId=@thisBook.BookId&category_id=@thisBook.CategoryId2">@Model.FindCategory(thisBook.CategoryId2, Model.Categories)</a>
+                            </li>
+                            @{
+                                if (thisBook.CategoryId3 != 0)
+                                {
+                                    <li class="tag__item">
+                                        <i class="mr-2"></i>
+                                        <a href="/Review/Index?bookId=@thisBook.BookId&category_id=@thisBook.CategoryId3">@Model.FindCategory(thisBook.CategoryId3, Model.Categories)</a>
+                                    </li>
+                                }
+                            }
+                            <li class="tag__item"><i class="mr-2"></i>Average Rating: @Model.GetAverageRating(thisBook.BookId)</li>
+                        </ul>
+                    </div>
+                </article>
+                @{
+                    string[] classes = new string[] { "blue", "red", "green", "yellow" };
+                    Random count = new Random();
+                    Review rev = Model.GetReview(thisBook.BookId, userId, Model.Reviews);
+                    if (SignInManager.IsSignedIn(User) && rev != null)
+                    {
+                        <div class="row review-content ">
+                            <article class="postcard dark @classes[count.Next(0,3)] user-review">
+                                <div class="book-card-text">
+                                    <div class="user-info">
+                                        @{
+                                            exitedReviewId = rev.ReviewId;
+                                            string AvatarID = "AV1";
+                                            IdentityUser user = await UserManager.FindByIdAsync(userId);
+                                            string userName = user.UserName;
+                                        }
+                                        <img class="user-avatar" src="~/img/avt_img/@(AvatarID).jpg" alt="Image Title" />
+                                        <a class="user-gmail postcard__title @classes[count.Next(0,3)]" href="/Reviewer/Index?userId=@userId">@userName</a>
+                                        <a class="btn btn-close delete-btn" href="Delete/@Model.GetReview(thisBook.BookId, userId, Model.Reviews).ReviewId"></a>
+                                    </div>
+                                    <div class="postcard__subtitle small">
+                                        <i class="mr-2"></i>@rev.ReviewDate
+                                    </div>
+                                    <div class="postcard__bar"></div>
+                                    <div class="postcard__preview-txt">@rev.Detail</div>
+                                    <ul class="postcard__tagbox" style="list-style-type: none;">
+                                        <li style="margin-right: 12px;">
+                                            @for (int i = 0; i < 5; i++)
+                                            {
+                                                if (i < rev.Rating)
+                                                {
+                                                    <label class='bx bxs-star star active' style="--i: @i;"></label>
+                                                }
+                                                else
+                                                {
+                                                    <label class='bx bx-star star' style="--i: @i;"></label>
+                                                }
+                                            }
+                                        </li>
+                                        <li class="tag__item"><i class="mr-2"></i>Up</li>
+                                        <h5 class="mr-2" style="margin-right: 6px;">@rev.TotalVotes</h5>
+                                        <li class="tag__item"><i class="mr-2"></i>Down</li>
+                                    </ul>
+                                </div>
+                            </article>
+                        </div>
+                    }
+                    foreach (var review in Model.PageReviews(currentPage, itemsPerPage, bookId))
+                    {
+                        if (review.BookId == thisBook.BookId && review.ReviewId != exitedReviewId)
+                        {
+                            <div class="row review-content">
+                                <article class="postcard dark @classes[count.Next(0,3)]">
+                                    <div class="book-card-text">
+                                        <div class="user-info">
+                                            @{
+                                                string AvatarID = "AV1";
+                                                string userIdInList = review.UserId;
+                                                IdentityUser user = await UserManager.FindByIdAsync(userIdInList);
+                                                string userName = user.UserName;
+                                            }
+                                            <img class="user-avatar" src="~/img/avt_img/@(AvatarID).jpg" alt="Image Title" />
+                                            <a class="user-gmail postcard__title @classes[count.Next(0,3)]" href="/Reviewer/Index?userId=@userIdInList">@userName</a>
+                                        </div>
+                                        <div class="postcard__subtitle small">
+                                            <i class="mr-2"></i>@review.ReviewDate
+                                        </div>
+                                        <div class="postcard__bar"></div>
+                                        <div class="postcard__preview-txt">@review.Detail</div>
+                                        @{
+                                            Vote vote = Model.VoteStatus(review.ReviewId, userId, Model.Votes);
+                                            var up = " ";
+                                            var down = " ";
+                                            var disableUp = " ";
+                                            var disableDown = " ";
+                                            if (vote != null && vote.VoteValue > 0)
+                                            {
+                                                up = "up-voted";
+                                                disableDown = "disable-vote";
+                                            }
+                                            if (vote != null && vote.VoteValue < 0)
+                                            {
+                                                down = "down-voted";
+                                                disableUp = "disable-vote";
+                                            }
+                                        }
+                                        <ul class="postcard__tagbox" style="list-style-type: none;">
+                                            <li style="margin-right: 12px;">
+                                                @for (int i = 0; i < 5; i++)
+                                                {
+                                                    if (i < review.Rating)
+                                                    {
+                                                        <label class='bx bxs-star star active' style="--i: @i;"></label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class='bx bx-star star' style="--i: @i;"></label>
+                                                    }
+                                                }
+                                            </li>
+                                            @if (!Model.isBlocked(userId))
+                                            {
+                                                <li class="tag__item @up @disableUp" onclick="upVote('@review.ReviewId', @redirect)"
+                                                    id="btn_up_@review.ReviewId"><i class="mr-2"></i>Up</li>
+                                                <h5 class="mr-2" style="margin-right: 6px;" id="value_@review.ReviewId">@review.TotalVotes</h5>
+                                                <li class="tag__item @down @disableDown" onclick="downVote('@review.ReviewId', @redirect)"
+                                                    id="btn_down_@review.ReviewId"><i class="mr-2"></i>Down</li>
+
+                                                if (Model.CheckExistedReport(review.ReviewId, userId, Model.Reports))
+                                                {
+                                                    <a class="btn btn-danger report-btn" id="@($"Re_{review.ReviewId}")"
+                                                       onclick="addReport('@review.ReviewId','@userId',@redirect)"
+                                                       reference="false">Reported</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="btn btn-info report-btn" id="@($"Re_{review.ReviewId}")"
+                                                       onclick="addReport('@review.ReviewId','@userId',@redirect)"
+                                                    reference="true">Report</a>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <li class="tag__item blocked"><i class="mr-2"></i>Up</li>
+                                                <h5 class="mr-2" style="margin-right: 6px;" id="value_@review.ReviewId">@review.TotalVotes</h5>
+                                                <li class="tag__item blocked"><i class="mr-2"></i>Down</li>
+                                                <a class="btn btn-danger report-btn blocked">Report</a>
+                                            }
+                                        </ul>
+                                    </div>
+                                </article>
+                            </div>
+                        }
+                    }
+                }
+                <div class="center">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="/Review/Index?bookId=@(bookId)&page=@(firstPage)&size=@(itemsPerPage)" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            @foreach (var item in pageNumbers)
+                            {
+                                <li class="page-item"><a class="page-link" href="/Review/Index?bookId=@(bookId)&page=@(item)&size=@(itemsPerPage)">@(item + 1)</a></li>
+                            }
+
+                            <li class="page-item">
+                                <a class="page-link" href="/Review/Index?bookId=@(bookId)&page=@(lastPage)&size=@(itemsPerPage)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col col-3 book-info">
+                <div class="book-card-display">
+                    <img class="book-card-display-img" src="~/img/book_img/@(thisBook.ImageName)" alt="Image Title" />
+                    @{
+                        if (Model.CheckExistedFavourite(thisBook.BookId, userId, Model.FavouriteBooks) && !Model.isBlocked(userId))
+                        {
+                            <a class="btn btn-danger btn-add" id="@($"fav_{thisBook.BookId}")" 
+                                onclick="addFavourites('@thisBook.BookId',@redirect)"
+                               reference="false">Delete from favourite</a>
+                        }
+                        else if (!Model.isBlocked(userId))
+                        {
+                            <a class="btn btn-info btn-add" id="@($"fav_{thisBook.BookId}")" 
+                                onclick="addFavourites('@thisBook.BookId',@redirect)"
+                            reference="true">Add to Favourites</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-info btn-add blocked">Add to Favourites</a>
+                        }
+                    }
+                    <h5>What do you think?</h5>
+                    <a class="btn btn-outline-success btn-edit d-none">Edit your Review</a>
+                    <a class="btn btn-outline-success btn-review d-none">Write a Review</a>
+                    @if (!SignInManager.IsSignedIn(User))
+                    {
+                        <script>
+                            document.querySelector('.btn-review').addEventListener("click", function () {
+                                window.location.href = '/Identity/Account/Login';
+                            });
+                        </script>
+                    }
+                    else
+                    {
+                        <script>
+                            document.querySelector('.btn-review').addEventListener("click", function () {
+                                document.querySelector('.write-model').style.display = "flex";
+                                document.querySelector('body').style.overflow = "hidden";
+                            });
+                        </script>
+                    }
+                    @{
+                        if (Model.IsExitedComment(thisBook.BookId, userId, Model.Reviews) && !Model.isBlocked(userId))
+                        {
+                            <script>
+                                document.querySelector('.btn-edit').classList.remove("d-none");
+                                document.querySelector('.btn-edit').setAttribute("href", "Edit/@Model.GetReview(thisBook.BookId, userId, Model.Reviews).ReviewId");
+                            </script>
+                        }
+                        else if (!Model.isBlocked(userId))
+                        {
+                            <script>
+                                document.querySelector('.btn-review').classList.remove("d-none");
+                            </script>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-danger btn-review blocked">You cant write or edit</a>
+                        }
+                    }
+                </div>
+                <div class="row" style="margin-left: 20px;">
+                    <div class="datetime">
+                        <div class="date">
+                            <span id="dayname">Day</span>,
+                            <span id="month">Month</span>
+                            <span id="daynum">00</span>,
+                            <span id="year">Year</span>
+                        </div>
+                        <div class="time">
+                            <span id="hour">00</span>:
+                            <span id="minutes">00</span>:
+                            <span id="seconds">00</span>
+                            <span id="period">AM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="write-model">
+        <div class="write-container">
+            <div class="write-btn-container">
+                <button class="btn post-btn add-btn">Post</button>
+                <button class="btn close-btn">Cancel</button>
+            </div>
+            <div class="write-zone">
+                <div class="rating-zone">
+                    <form asp-action="Create" id="write-new-review">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="UserId" class="form-control" value="@userId" type="hidden" />
+                        <input asp-for="BookId" class="form-control" value="@thisBook.BookId" type="hidden" />
+                        <input asp-for="ReviewDate" class="form-control" id="current-date" type="hidden" />
+                        <div class="rating-zone-header form-group rating">
+                            <p>Your rating: </p>
+                            <label class='bx bx-star star' style="--i: 0;"></label>
+                            <label class='bx bx-star star' style="--i: 1;"></label>
+                            <label class='bx bx-star star' style="--i: 2;"></label>
+                            <label class='bx bx-star star' style="--i: 3;"></label>
+                            <label class='bx bx-star star' style="--i: 4;"></label>
+                            <input asp-for="Rating" class="form-control" type="text" type="hidden" required />
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+                        <input asp-for="UpVotes" class="form-control" value="0" type="hidden" />
+                        <input asp-for="DownVotes" class="form-control" value="0" type="hidden" />
+                        <input asp-for="TotalVotes" class="form-control" value="0" type="hidden" />
+                        <textarea asp-for="Detail" value="0" class="review-text" placeholder="Write your review here" style="white-space: pre-wrap;"></textarea>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="search-result-model">
+        <div class="search-result-container">
+            <div class="search-result-header">
+                <div class="search-result-category">
+                    <h2>Category:</h2>
+                    @{
+                        int categoryId = (!String.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["category_id"])) ? Int32.Parse(ViewContext.HttpContext.Request.Query["category_id"]) : 0;
+                        <h2 class="search-result-category-current">@Model.FindCategory(categoryId, Model.Categories)</h2>
+                    }
+                </div>
+                <button class="btn btn-danger close-search-btn">Cancel</button>
+            </div>
+            <div class="search-result-content container">
+                <div class="row">
+                    @{
+                        foreach (var obj in Model.Books)
+                        {
+                            if (obj.CategoryId1 == categoryId || obj.CategoryId2 == categoryId || obj.CategoryId3 == categoryId)
+                            {
+                                <div class="col col-4 search-result-book">
+                                    <img class="search-result-book-img" src="~/img/book_img/@(obj.ImageName)" alt="Image Title" />
+                                    <div class="search-result-book-info">
+                                        <h3 class="search-result-book-title">@obj.BookName</h3>
+                                        <p class="search-result-book-author">@Model.FindAuthor(obj.AuthorId, Model.Authors)</p>
+                                        <a class="btn btn-outline-primary more-btn" href="/Review/Index?bookId=@obj.BookId">More</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    @* <div class="search-result-book-rating">
+                    <div>4.5</div>
+                    <div class="fas fa-star"></div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="text/javascript" src="~/js/review.js"></script>
+
+   
+
+</body>
+<script type="text/javascript">
+    function upVote(reviewId, redirect) {
+        const buttonUp = document.getElementById("btn_up_" + reviewId);
+        let up = buttonUp.classList.contains("up-voted") ? "up-voted" : "";
+        let disableUp = buttonUp.classList.contains("disableUp");
+
+        if (disableUp) {
+            return;
+        }
+        if (redirect) {
+            window.location.assign("/Identity/Account/Login");
+            return;
+        } 
+        let dataUpVote = { "reviewId": reviewId, "value": 1};
+        let urlUpVote = "/api/review/upvote";
+        invokeApiForVote(urlUpVote, dataUpVote, up);
+    };
+
+    function downVote(reviewId, redirect) {
+        const buttonDown = document.getElementById("btn_down_" + reviewId);
+        let down = buttonDown.classList.contains("down-voted") ? "down-voted" : "";
+        let disableDown = buttonDown.classList.contains("disableDown");
+
+        if (disableDown) {
+            return;
+        }
+        if (redirect) {
+            window.location.assign("/Identity/Account/Login");
+            return;
+        }
+        let dataDownVote = { "reviewId": reviewId, "value": -1};
+        let urlDownVote = "/api/review/downvote";
+        invokeApiForVote(urlDownVote, dataDownVote, down);
+    };
+
+    function invokeApiForVote(url, data, action) {
+        const empty = " ";
+        $.ajax({
+            type: 'POST',
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                console.log(result);
+
+                // Find tag (h5) by id Ex: value_R000000200
+                const totalVoteTag = document.getElementById("value_" + data.reviewId);
+                totalVoteTag.innerHTML = result;
+                const buttonUp = document.getElementById("btn_up_" + data.reviewId);
+                const buttonDown = document.getElementById("btn_down_" + data.reviewId);
+                if (data.value > 0) {
+                    if (action == "up-voted") {
+                        // remove upvote
+                        buttonUp.classList.remove("up-voted");
+                        buttonDown.classList.remove("disable-vote");
+                    } else {
+                        buttonDown.classList.add("disable-vote");
+                        buttonUp.classList.add("up-voted");
+                    }
+                } else {
+                    if (action == "down-voted") {
+                        // remove downvote
+                        buttonDown.classList.remove("down-voted");
+                        buttonUp.classList.remove("disable-vote");
+                    } else {
+                        buttonUp.classList.add("disable-vote");
+                        buttonDown.classList.add("down-voted");
+                    }
+                }
+            },
+            error: function () {
+                console.log('Invoke Api failed : ' + url);
+            }
+        });
+    };
+
+    function addFavourites(BookId, redirect) {
+        if (redirect) {
+            window.location.assign("/Identity/Account/Login");
+            return;
+        }
+        let button = document.getElementById("fav_" + BookId);
+        let reference = button.getAttribute("reference");
+        let dataAddFavourites = { "BookId": BookId };
+        let urlAddFavourites = "/api/review/addfavourites";
+        let isAdding = reference == "true" ? true : false;
+        invokeApiForFav(urlAddFavourites, dataAddFavourites, isAdding);
+    }
+    function invokeApiForFav(url, data, isAdding) {
+        $.ajax({
+            type: 'POST',
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                console.log(result);
+                let button = document.getElementById("fav_" + data.BookId);
+                if (isAdding) { // true => user clicks on Add => need to change to Delete
+                    button.classList.remove("btn", "btn-infor", "btn-add");
+                    button.classList.add("btn", "btn-danger", "btn-add");
+                    button.innerHTML = "Delete from favourite";
+                    button.setAttribute("reference", "false");
+                } else {
+                    button.classList.remove("btn", "btn-danger", "btn-add");
+                    button.classList.add("btn", "btn-infor", "btn-add");
+                    button.innerHTML = "Add to Favourites";
+                    button.setAttribute("reference", "true");
+                }
+             
+            },
+            error: function () {
+                console.log('Invoke Api failed : ' + url);
+            }
+        });
+    };
+    function addReport(ReviewId,UserId,redirect){
+        if (redirect) {
+            window.location.assign("/Identity/Account/Login");
+            return;
+        }
+        let button = document.getElementById("Re_" + ReviewId);
+        let reference = button.getAttribute("reference");
+        let dataAddReports = { "ReviewId": ReviewId };
+        let urlAddReports = "/api/review/addreports";
+        let isAdding = reference == "true" ? true : false;
+        invokeApiForReport(urlAddReports, dataAddReports, isAdding);
+    }
+    function invokeApiForReport(url, data, isAdding) {
+        $.ajax({
+            type: 'POST',
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                console.log(result);
+                let button = document.getElementById("Re_" + data.ReviewId);
+                if (isAdding) { // true => user clicks on Add => need to change to Delete
+                    button.classList.remove("btn", "btn-infor");
+                    button.classList.add("btn", "btn-danger");
+                    button.innerHTML = "Reported";
+                    button.setAttribute("reference", "false");
+                } else {
+                    button.classList.remove("btn", "btn-danger");
+                    button.classList.add("btn", "btn-infor");
+                    button.innerHTML = "Report";
+                    button.setAttribute("reference", "true");
+                }
+            },
+            error: function () {
+                console.log('Invoke Api failed : ' + url);
+            }
+        });
+    };
+</script>
+</html>

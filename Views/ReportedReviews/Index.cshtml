@@ -1,0 +1,65 @@
+﻿@model FullDataViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+<head>
+    <title>Admin Zone - Reported Reviews</title>
+    <link rel="stylesheet" href="~/css/reported_style.css" />
+</head>
+<body>
+     <div class="container wrap-container">
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="thead-detail">
+                            Detail
+                        </th>
+                        <th>
+                            Reported number
+                        </th>
+                        <th> 
+                            Percent
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ReportedReviewIds(Model.Reports))
+                    {
+                        foreach(var review in Model.Reviews)
+                        {
+                            if(review.ReviewId == item)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => review.Detail)
+                                    </td>
+                                    <td>
+                                        @{
+                                            var count = Model.ReportedNumber(review.ReviewId, Model.Reports);
+                                        }
+                                        @count
+                                    </td>
+                                    <td>
+                                        @{
+                                            double reportedCount = Model.ReportedNumber(review.ReviewId, Model.Reports);
+                                            double interactionCount = Model.InteractionBook(Model.ReviewIdListOfBook(review.BookId));
+                                            Console.WriteLine(reportedCount + " , " + interactionCount);
+                                            double percent = (reportedCount / interactionCount) * 100;
+                                            string formattedNumber = percent.ToString("0.00");
+                                        }
+                                        @formattedNumber%
+                                    </td>
+                                    <td>
+                                        <a asp-action="Delete" asp-route-id="@review.ReviewId">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        }                        
+                    }
+                </tbody>
+            </table>
+        </div>
+     </div>
+</body>

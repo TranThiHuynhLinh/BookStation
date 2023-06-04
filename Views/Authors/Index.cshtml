@@ -1,0 +1,106 @@
+﻿@model IEnumerable<BookStation.Models.Author>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<head>
+    <title>Admin Zone - Authors</title>
+    <link rel="stylesheet" href="~/css/admin_page.css" />
+</head>
+<body>
+    <div class="admin_container container">
+        <div class="swap-btn-container">
+            <a class="btn btn-outline-primary" asp-controller="Authors" asp-action="Index">Authors</a>
+            <a class="btn btn-outline-success" asp-controller="Categories" asp-action="Index">Categories</a>
+            <a class="btn btn-outline-primary" asp-controller="Books" asp-action="Index">Books</a>
+            <a class="btn btn-outline-success" asp-controller="Reviews" asp-action="Index">Reviews</a>
+        </div>
+        <button class="btn btn-primary mb-2">
+            <a class="admin_button" asp-action="Create">Create New</a>
+        </button>
+        <input type="text" id="Search" placeholder="Search" class="form-control search-bar" />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AuthorId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AuthorName)
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="Search">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuthorId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AuthorName)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a>  
+                            <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        function removeVietnameseDiacritics(text) {
+            const diacriticsMap = {
+                'á': 'a', 'à': 'a', 'ả': 'a', 'ã': 'a', 'ạ': 'a',
+                'â': 'a', 'ấ': 'a', 'ầ': 'a', 'ẩ': 'a', 'ẫ': 'a', 'ậ': 'a',
+                'ă': 'a', 'ắ': 'a', 'ằ': 'a', 'ẳ': 'a', 'ẵ': 'a', 'ặ': 'a',
+                'đ': 'd',
+                'é': 'e', 'è': 'e', 'ẻ': 'e', 'ẽ': 'e', 'ẹ': 'e',
+                'ê': 'e', 'ế': 'e', 'ề': 'e', 'ể': 'e', 'ễ': 'e', 'ệ': 'e',
+                'í': 'i', 'ì': 'i', 'ỉ': 'i', 'ĩ': 'i', 'ị': 'i',
+                'ó': 'o', 'ò': 'o', 'ỏ': 'o', 'õ': 'o', 'ọ': 'o',
+                'ô': 'o', 'ố': 'o', 'ồ': 'o', 'ổ': 'o', 'ỗ': 'o', 'ộ': 'o',
+                'ơ': 'o', 'ớ': 'o', 'ờ': 'o', 'ở': 'o', 'ỡ': 'o', 'ợ': 'o',
+                'ú': 'u', 'ù': 'u', 'ủ': 'u', 'ũ': 'u', 'ụ': 'u',
+                'ư': 'u', 'ứ': 'u', 'ừ': 'u', 'ử': 'u', 'ữ': 'u', 'ự': 'u',
+                'ý': 'y', 'ỳ': 'y', 'ỷ': 'y', 'ỹ': 'y', 'ỵ': 'y',
+            };
+
+            return text.replace(/[^\u0000-\u007E]/g, function (char) {
+                return diacriticsMap[char] || char;
+            });
+        }
+        //function Contains(text1, text2) {
+        //    if (text1.indexOf(text2) != -1) {
+        //        return true;
+        //    }
+        //}
+        function Contains(text1, text2) {
+            const normalizedText1 = removeVietnameseDiacritics(text1.toLowerCase());
+            const normalizedText2 = removeVietnameseDiacritics(text2.toLowerCase());
+            if (normalizedText1.includes(normalizedText2)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        $("#Search").keyup(function () {
+            var searchText = $("#Search").val().toLowerCase();
+            $(".Search").each(function () {
+                if (!Contains($(this).text().toLowerCase(), searchText)) {
+                    $(this).hide();
+                }
+                else {
+                    $(this).show();
+                }
+            });
+        });
+    });
+
+</script>

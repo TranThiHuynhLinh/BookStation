@@ -1,0 +1,90 @@
+﻿@model IEnumerable<BookStation.Models.Review>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@*<h1>Index</h1>*@
+
+<head>
+    <title>Admin Zone - Reviews</title>
+    <link rel="stylesheet" href="~/css/admin_page.css" />
+</head>
+<body> 
+    <div class="admin_container container">
+        <div class="swap-btn-container">
+            <a class="btn btn-outline-primary" asp-controller="Authors" asp-action="Index">Authors</a>
+            <a class="btn btn-outline-success" asp-controller="Categories" asp-action="Index">Categories</a>
+            <a class="btn btn-outline-primary" asp-controller="Books" asp-action="Index">Books</a>
+            <a class="btn btn-outline-success" asp-controller="Reviews" asp-action="Index">Reviews</a>
+        </div>
+        <a class="btn btn-outline-danger admin-button mb-2" asp-controller="ReportedReviews" asp-action="Index">Reported Reviews</a>
+        <input type="text" id="Search" placeholder="Search" class="form-control search-bar" />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BookId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReviewDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Rating)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UpVotes)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DownVotes)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TotalVotes)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Detail)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BookId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReviewDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Rating)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UpVotes)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DownVotes)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TotalVotes)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Detail)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ReviewId">Details</a> 
+                            <a asp-action="Delete" asp-route-id="@item.ReviewId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+</body>
+

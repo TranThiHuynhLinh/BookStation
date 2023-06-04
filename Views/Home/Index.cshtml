@@ -1,0 +1,215 @@
+﻿@model FullDataViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!doctype html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="~/css/home_style.css" />
+    <link rel="stylesheet" href="~/css/book_card.css" />
+</head>
+<body>
+    <div class="wrap-container">
+        <div class="container wrap-info">
+            <div class="row justify-content-center home-nav">
+                <div class="col col-4">
+                    <img class="home_img" src="./img/home_img.png" alt="Image Title" />
+                </div>
+                <div class="col col-6 home-introduction">
+                    <h1 class="mb-3 fw-semibold lh-1 home-introduction-title">
+                        Get on board with
+                        knowledge at Book Station!
+                    </h1>
+                    <p class="lead mb-4 fw-normal home-introduction-detail">
+                        The book review community is a group of
+                        passionate readers who share recommendations and feedback about
+                        book. Joining this
+                        community connects you with like-minded individuals and helps you
+                        discover new books to read.
+                    </p>
+                </div>
+                <div class="categories-filter">
+                    <div class="categories-filter-title">
+                        Find your next great read using our filter categories
+                    </div>
+                    <form method="GET" asp-action="" class="category-submit">
+                        <select class="category-select form-select form-select-lg" aria-label=".form-select-lg example" name="category_id">
+                            <option selected value="">Category</option>
+                            @foreach (var obj in Model.Categories)
+                            {
+                                <option value="@obj.CategoryId">@obj.CategoryName</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn search-btn">
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col col-12">
+                    <section class="dark">
+                        <div class="py-4">
+                            <h1 class="h1 text-center" id="pageHeaderTitle">Search your book by name</h1>
+                            <div class="search-name-model">
+                                <div class="search-name">
+                                    <input type="text" id="Search" class="search-bar" placeholder="Search" />
+                                    <div class="search-table">
+                                        <table>
+                                            <tbody>
+                                                @foreach (var obj in Model.Books)
+                                                {
+                                                    <tr class="Search">
+                                                        <td class="row-search" onmouseover="showValue('@obj.BookId','@obj.ImageName', '@obj.BookName', '@Model.FindAuthor(obj.AuthorId, Model.Authors)', '@Model.GetAverageRating(obj.BookId)')">
+                                                            <a href="/Review/Index?bookId=@obj.BookId">
+                                                                @obj.BookName
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="search-info">
+                                    <div class="book-info">
+                                        <a href="/Review/Index?bookId=1" id="search-info-link"><img class="search-info-img" src="./img/book_img/1.jpg" alt="Image Title" /></a>
+                                        <div class="search-info-text">
+                                            <h3 class="search-info-name">Rừng Na Uy</h3>
+                                            <h5 class="search-info-author">Murakami Haruki</h5>
+                                            <div class="search-info-wrap-rating">
+                                                <h4 class="search-info-rating">@Model.GetAverageRating(1)</h4>
+                                                <label class='bx bxs-star star'></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h1 class="h1 text-center" id="pageHeaderTitle">Top 10 Most Popular Books</h1>
+                            @{
+                                string[] classes = new string[] { "blue", "red", "green", "yellow" };
+                                int count = 0;
+                                List<int> listPopularBookId = new List<int>();
+                                listPopularBookId = Model.ListPopularBookId(10);
+                                foreach (var id in listPopularBookId)
+                                {
+                                    Book book = Model.FindBook(id, Model.Books);
+                                    <article class="postcard dark @classes[count % classes.Length]">
+                                        <a class="postcard__img_link" href="#">
+                                            <img class="postcard__img" src="./img/book_img/@(book.BookId).jpg" alt="Image Title" />
+                                        </a>
+                                        <div class="postcard__text">
+                                            <h1 class="postcard__title @classes[count % classes.Length]"><a href="/Review/Index?bookId=@book.BookId">@book.BookName</a></h1>
+                                            <div class="postcard__subtitle small">
+                                                <i class="mr-2"></i>@Model.FindAuthor(book.AuthorId, Model.Authors)
+                                            </div>
+                                            <div class="postcard__bar"></div>
+                                            <div class="postcard__preview-txt">@Model.SelectText(book.Summary, 300)...</div>
+                                            <ul class="postcard__tagbox">
+                                                <li class="tag__item"><i class="mr-2"></i>@Model.FindCategory(book.CategoryId1, Model.Categories)</li>
+                                                <li class="tag__item"><i class="mr-2"></i>@Model.FindCategory(book.CategoryId2, Model.Categories)</li>
+                                                <li class="tag__item"><i class="mr-2"></i>Average Rating: @Model.GetAverageRating(book.BookId)</li>
+                                                <li class="tag__item play @classes[count % classes.Length]">
+                                                    <a href="#"><i class="mr-2"></i>Read more</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </article>
+                                    count++;
+                                }
+                            }
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="search-result-model">
+        <div class="search-result-container">
+            <div class="search-result-header">
+                <div class="search-result-category">
+                    <h2>Category:</h2>
+                    @{
+                        int categoryId = (!String.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["category_id"])) ? Int32.Parse(ViewContext.HttpContext.Request.Query["category_id"]) : 0;
+                        <h2 class="search-result-category-current">@Model.FindCategory(categoryId, Model.Categories)</h2>
+                    }
+                </div>
+                <button class="btn btn-danger close-btn">Cancel</button>
+            </div>
+            <div class="search-result-content container">
+                <div class="row">
+                    @{
+                        foreach(var obj in Model.Books)
+                        {
+                            if (obj.CategoryId1 == categoryId || obj.CategoryId2 == categoryId || obj.CategoryId3 == categoryId)
+                            {
+                                <div class="col col-4 search-result-book">
+                                    <img class="search-result-book-img" src="./img/book_img/@(obj.ImageName)" alt="Image Title" />
+                                    <div class="search-result-book-info">
+                                        <h3 class="search-result-book-title">@obj.BookName</h3>
+                                        <p class="search-result-book-author">@Model.FindAuthor(obj.AuthorId, Model.Authors)</p>
+                                        <a class="btn btn-outline-primary more-btn" href="/Review/Index?bookId=@obj.BookId">More</a>
+                                    </div>
+                                </div>  
+                            }
+                        }
+                    }
+                   @* <div class="search-result-book-rating">
+                        <div>4.5</div>
+                        <div class="fas fa-star"></div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="~/js/home.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+            function removeVietnameseDiacritics(text) {
+                const diacriticsMap = {
+                    'á': 'a', 'à': 'a', 'ả': 'a', 'ã': 'a', 'ạ': 'a',
+                    'â': 'a', 'ấ': 'a', 'ầ': 'a', 'ẩ': 'a', 'ẫ': 'a', 'ậ': 'a',
+                    'ă': 'a', 'ắ': 'a', 'ằ': 'a', 'ẳ': 'a', 'ẵ': 'a', 'ặ': 'a',
+                    'đ': 'd',
+                    'é': 'e', 'è': 'e', 'ẻ': 'e', 'ẽ': 'e', 'ẹ': 'e',
+                    'ê': 'e', 'ế': 'e', 'ề': 'e', 'ể': 'e', 'ễ': 'e', 'ệ': 'e',
+                    'í': 'i', 'ì': 'i', 'ỉ': 'i', 'ĩ': 'i', 'ị': 'i',
+                    'ó': 'o', 'ò': 'o', 'ỏ': 'o', 'õ': 'o', 'ọ': 'o',
+                    'ô': 'o', 'ố': 'o', 'ồ': 'o', 'ổ': 'o', 'ỗ': 'o', 'ộ': 'o',
+                    'ơ': 'o', 'ớ': 'o', 'ờ': 'o', 'ở': 'o', 'ỡ': 'o', 'ợ': 'o',
+                    'ú': 'u', 'ù': 'u', 'ủ': 'u', 'ũ': 'u', 'ụ': 'u',
+                    'ư': 'u', 'ứ': 'u', 'ừ': 'u', 'ử': 'u', 'ữ': 'u', 'ự': 'u',
+                    'ý': 'y', 'ỳ': 'y', 'ỷ': 'y', 'ỹ': 'y', 'ỵ': 'y',
+                };
+
+                return text.replace(/[^\u0000-\u007E]/g, function (char) {
+                    return diacriticsMap[char] || char;
+                });
+            }
+            function Contains(text1, text2) {
+                const normalizedText1 = removeVietnameseDiacritics(text1.toLowerCase());
+                const normalizedText2 = removeVietnameseDiacritics(text2.toLowerCase());
+                if (normalizedText1.includes(normalizedText2)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            $("#Search").keyup(function () {
+                var searchText = $("#Search").val().toLowerCase();
+                $(".Search").each(function () {
+                    if (!Contains($(this).text().toLowerCase(), searchText)) {
+                        $(this).hide();
+                    }
+                    else {
+                        $(this).show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
